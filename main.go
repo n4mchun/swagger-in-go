@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/swagger/v2"
 	_ "github.com/n4mchun/swagger-in-go/docs"
 )
 
@@ -22,6 +23,8 @@ func main() {
 }
 
 func setupRoutes(app *fiber.App) {
+	app.Get("/swagger/*", swagger.HandlerDefault)
+
 	app.Post("/users", createUser)
 	app.Get("/users", getAllUsers)
 	app.Get("/users/:id", getUser)
