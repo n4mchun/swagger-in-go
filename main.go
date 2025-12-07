@@ -1,6 +1,9 @@
 package main
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/gofiber/fiber/v3"
+	_ "github.com/n4mchun/swagger-in-go/docs"
+)
 
 type User struct {
 	ID   string `json:"id"`
@@ -26,21 +29,21 @@ func setupRoutes(app *fiber.App) {
 	app.Delete("/users/:id", deleteUser)
 }
 
-func createUser(c *fiber.Ctx) error {
+func createUser(c fiber.Ctx) error {
 	u := new(User)
-	if err := c.BodyParser(u); err != nil {
-		return c.Status(400).JSON(fiber.Map{"error": "invalid body"})
+	if err := c.Bind().Body(&u); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid body"})
 	}
 
 	if _, exists := users[u.ID]; exists {
-		return c.Status(409).JSON(fiber.Map{"error": "user already exists"})
+		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"error": "user already exists"})
 	}
 
 	users[u.ID] = *u
 	return c.JSON(u)
 }
 
-func getAllUsers(c *fiber.Ctx) error {
+func getAllUsers(c fiber.Ctx) error {
 	result := []User{}
 	for _, u := range users {
 		result = append(result, u)
@@ -48,25 +51,25 @@ func getAllUsers(c *fiber.Ctx) error {
 	return c.JSON(result)
 }
 
-func getUser(c *fiber.Ctx) error {
+func getUser(c fiber.Ctx) error {
 	id := c.Params("id")
 	u, exists := users[id]
 	if !exists {
-		return c.Status(404).JSON(fiber.Map{"error": "not found"})
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "not found"})
 	}
 	return c.JSON(u)
 }
 
-func updateUser(c *fiber.Ctx) error {
+func updateUser(c fiber.Ctx) error {
 	id := c.Params("id")
 	_, exists := users[id]
 	if !exists {
-		return c.Status(404).JSON(fiber.Map{"error": "not found"})
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "not found"})
 	}
 
 	u := new(User)
-	if err := c.BodyParser(u); err != nil {
-		return c.Status(400).JSON(fiber.Map{"error": "invalid body"})
+	if err := c.Bind().Body(&u); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid body"})
 	}
 	u.ID = id
 
@@ -74,11 +77,11 @@ func updateUser(c *fiber.Ctx) error {
 	return c.JSON(u)
 }
 
-func deleteUser(c *fiber.Ctx) error {
+func deleteUser(c fiber.Ctx) error {
 	id := c.Params("id")
 	_, exists := users[id]
 	if !exists {
-		return c.Status(404).JSON(fiber.Map{"error": "not found"})
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "not found"})
 	}
 
 	delete(users, id)
