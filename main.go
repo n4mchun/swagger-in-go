@@ -14,6 +14,16 @@ type User struct {
 
 var users = map[string]User{}
 
+// @title			Fiber Example API
+// @version		1.0
+// @description	This is a sample swagger for Fiber
+// @termsOfService	http://swagger.io/terms/
+// @contact.name	n4mchun
+// @contact.email	n4mchun@gmail.com
+// @license.name	MIT
+// @license.url	None
+// @host			localhost:8080
+// @BasePath		/
 func main() {
 	app := fiber.New()
 

@@ -1,4 +1,15 @@
+basePath: /
+host: localhost:8080
 info:
-  contact: {}
+  contact:
+    email: n4mchun@gmail.com
+    name: n4mchun
+  description: This is a sample swagger for Fiber
+  license:
+    name: MIT
+    url: None
+  termsOfService: http://swagger.io/terms/
+  title: Fiber Example API
+  version: "1.0"
 paths: {}
 swagger: "2.0"
