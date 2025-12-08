@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/swagger/v2"
 	_ "github.com/n4mchun/swagger-in-go/docs"
@@ -42,6 +44,16 @@ func setupRoutes(app *fiber.App) {
 	app.Delete("/users/:id", deleteUser)
 }
 
+// @Summary		Create User
+// @Description	create User by id, name, age
+// @Tags			User
+// @Accept			json
+// @Produce		json
+// @Param			Body	body		User	true	"User Object"
+// @Success		200		{object}	User
+// @Failure		400		{object}	InvalidBodyError		"Invalid Body"
+// @Failure		409		{object}	UserAlreadyExistsError	"User already exists"
+// @Router			/users [post]
 func createUser(c fiber.Ctx) error {
 	u := new(User)
 	if err := c.Bind().Body(&u); err != nil {
@@ -56,6 +68,13 @@ func createUser(c fiber.Ctx) error {
 	return c.JSON(u)
 }
 
+// @Summary		Get All Users
+// @Description	get all users data
+// @Tags			User
+// @Accept			json
+// @Produce		json
+// @Success		200	{object}	[]User
+// @Router			/users [get]
 func getAllUsers(c fiber.Ctx) error {
 	result := []User{}
 	for _, u := range users {
@@ -64,8 +83,20 @@ func getAllUsers(c fiber.Ctx) error {
 	return c.JSON(result)
 }
 
+// @Summary		Get User
+// @Description	get user by ID
+// @Tags			User
+// @Accept			json
+// @Produce		json
+// @Param			id	path		string	true	"User ID"
+// @Success		200	{object}	User
+// @Failure		404	{object}	NotFoundError	"User not found"
+// @Router			/users/{id} [get]
 func getUser(c fiber.Ctx) error {
 	id := c.Params("id")
+
+	fmt.Println(id)
+
 	u, exists := users[id]
 	if !exists {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "not found"})
@@ -73,16 +104,27 @@ func getUser(c fiber.Ctx) error {
 	return c.JSON(u)
 }
 
+// @Summary		Update User
+// @Description	update user by ID
+// @Tags			User
+// @Accept			json
+// @Produce		json
+// @Param			id		path		string	true	"User ID"
+// @Param			Body	body		User	true	"User Object"
+// @Success		200		{object}	User
+// @Failure		400		{object}	InvalidBodyError	"Invalid body"
+// @Failure		404		{object}	NotFoundError		"User not found"
+// @Router			/users/{id} [put]
 func updateUser(c fiber.Ctx) error {
 	id := c.Params("id")
 	_, exists := users[id]
 	if !exists {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "not found"})
+		return c.Status(fiber.StatusNotFound).JSON(NotFoundError{Error: "not found"})
 	}
 
 	u := new(User)
 	if err := c.Bind().Body(&u); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid body"})
+		return c.Status(fiber.StatusBadRequest).JSON(InvalidBodyError{Error: "invalid body"})
 	}
 	u.ID = id
 
@@ -90,6 +132,15 @@ func updateUser(c fiber.Ctx) error {
 	return c.JSON(u)
 }
 
+// @Summary		Delete User
+// @Description	delete user by ID
+// @Tags			User
+// @Accept			json
+// @Produce		json
+// @Param			id	path		string			true	"User ID"
+// @Success		200	{object}	DeleteSuccess	"User deleted"
+// @Failure		404	{object}	NotFoundError	"User not found"
+// @Router			/users/{id} [delete]
 func deleteUser(c fiber.Ctx) error {
 	id := c.Params("id")
 	_, exists := users[id]
@@ -100,3 +151,4 @@ func deleteUser(c fiber.Ctx) error {
 	delete(users, id)
 	return c.JSON(fiber.Map{"status": "deleted"})
 }
+	
