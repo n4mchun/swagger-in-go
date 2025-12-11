@@ -119,12 +119,12 @@ func updateUser(c fiber.Ctx) error {
 	id := c.Params("id")
 	_, exists := users[id]
 	if !exists {
-		return c.Status(fiber.StatusNotFound).JSON(NotFoundError{Error: "not found"})
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"Error": "not found"})
 	}
 
 	u := new(User)
 	if err := c.Bind().Body(&u); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(InvalidBodyError{Error: "invalid body"})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"Error": "invalid Body"})
 	}
 	u.ID = id
 
@@ -151,4 +151,3 @@ func deleteUser(c fiber.Ctx) error {
 	delete(users, id)
 	return c.JSON(fiber.Map{"status": "deleted"})
 }
-	
