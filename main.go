@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/cors"
 	"github.com/gofiber/swagger/v2"
 	_ "github.com/n4mchun/swagger-in-go/docs"
 )
@@ -29,9 +30,13 @@ var users = map[string]User{}
 func main() {
 	app := fiber.New()
 
+	app.Use(cors.New())
+
 	setupRoutes(app)
 
-	app.Listen(":8080")
+	if err := app.Listen(":8080"); err != nil {
+		fmt.Println(err)
+	}
 }
 
 func setupRoutes(app *fiber.App) {
