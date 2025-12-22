@@ -25,7 +25,6 @@ var users = map[string]User{}
 // @contact.email	n4mchun@gmail.com
 // @license.name	MIT
 // @license.url	None
-// @host			localhost:8080
 // @BasePath		/
 func main() {
 	app := fiber.New()
